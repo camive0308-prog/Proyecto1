@@ -1,45 +1,37 @@
-// crear un objeto mapa desde la clase
-
-// L-represenmta  a la biblioteca leaflet
-// El punto (.) se denomina operador de acceso 
-// Por ejemplo L.map(.) permite llamar a la funcion map () para crear mapas
+//crear un objeto mapa desde la clase L que es leaflet
+// L representa a  la biblioteca leaflet
+// Por ejemplo L.map () permite llamar a la funcion map() para crear mapas
 
 var map = L.map('map');
-
-//Objeto: un ejemplar de calse que tiene atributos y comportamiento definido 
+//objeto: un ejemplar de una clase que tiene atributos y comportamiento definido
 // definir los valores iniciales para el objeto map
-//.setview (arreglo con la lat, longitud del centro del mapa, entero que indica la zona)
+// . setview(arreglo con la LAT. longitud del centro del mapa, entero que indica la zona)
 
-map.setView([4.628040187640121, -74.0658435767757], 16);
-// crear un objeto capa de teselas ( mapa base)
-// L-tilelayer(url de donde voy a "estraer" el mapa, un JSON con los valores de config)
+map.setView([4.628138990880535, -74.06591620395287], 13);
 
+//crear un objeto capa de teseñas (mapa base)
+//L.titlelayer(url de donde voy a "extraer" el mapa, un Json con los valores de config)
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
 
-var urlMap ='https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-var config = {
-    maxZoom: 19 
-};
+//cargar un archivo Geojson
+//1. abrir el archivo. en js hay que tener cuidado con procesos que sean demorados
+//porque js no es sincrono. Es decir. si una sentencia se demora , js
+//continua con otra
 
-var layer= L.tileLayer(urlMap, config);
-
-// Agregar la capa del mapa 
-layer.Addto(map);
-
-// Cargar a un archivo Geojson 
-
-//l. Abrir el archivo . En js hay que tener cuidado con procesos que sean demorados
-//porque js no es un sincrono. 
-
-// 2. Convertir el contenido de este archivo a formato json 
-async function leerGeoJson(url) {
-    const response = await fetch(url);
+async function leerGeoJSON(url) {
+    var response = await fetch(url);
     return await response.json();
 }
 
-var myFile=leerGeoJson("map.geojson");
-console.log(myFile);
-
-//3. Agregar el geojson al mapa 
-const geoLayer=L.geoJSON(myFile) 
-
-geoLayer.addTO(map);
+// Usar IIFE (Immediately Invoked Function Expression) con async
+(async function() {
+    try {
+        const myfile = await leerGeoJSON("map.geojson");
+        L.geoJSON(myfile).addTo(map);
+    } catch (error) {
+        console.error("Error:", error);
+    }
+})();
